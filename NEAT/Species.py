@@ -46,7 +46,14 @@ class Species:
         return Genome.crossover(better_client.genome, worse_client.genome)
 
     def reset(self):
-        pass
+        self.representative = random.choice(self.members)
+
+        for member in self.members:
+            member.species = None
+
+        self.members.clear()
+        self.members.append(self.representative)
+        self.representative.species = self
 
     def go_extinct(self):
         self.representative.species = None

@@ -1,14 +1,20 @@
 import random
+import sys
 
 import pygame
 
 from Config import Config
-from NEAT import NEAT, Client
+from NEAT import NEAT
+from NEAT.Client import Client
 
 pygame.init()
 SCREEN = pygame.display.set_mode((Config.SW, Config.SH))
 FONT = pygame.font.SysFont("Arial", 12)
 current_client = 0
+
+seed = random.randrange(sys.maxsize)
+random.seed(1703487886160643318)
+print(seed)
 
 
 class FlappyClient(Client):
@@ -95,8 +101,6 @@ while True:
                 current_client = (current_client + 1) % Config.AMOUNT_OF_CLIENTS
             if event.key == pygame.K_LEFT:
                 current_client = (current_client - 1) % Config.AMOUNT_OF_CLIENTS
-            if event.key == pygame.K_d:
-                print("Debug!")
 
     clients[current_client].draw()
 

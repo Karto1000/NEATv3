@@ -34,3 +34,6 @@ class Client:
     def set_neat(self, neat: NEAT):
         self.neat = neat
         self.genome.neat = neat
+
+    def __repr__(self):
+        return f"Client<fitness {self.fitness}>"

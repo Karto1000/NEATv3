@@ -8,16 +8,22 @@
 # email diginno@ypsomed.com
 # author: Tim Leuenberger (Tim.leuenberger@ypsomed.com)
 # -----------------------------------------------------------
+from __future__ import annotations
+
 import copy
 import random
+import typing
 
 from Config import Config
-from NEAT.Node import Node, NodeType
-from NEAT.Client import Client
 from NEAT.Connection import Connection
 from NEAT.Genome import Genome
+from NEAT.Node import Node, NodeType
 from NEAT.Species import Species
+from NEAT.calculating import CalcNode
 from NEAT.utils import IdentificationCollection
+
+if typing.TYPE_CHECKING:
+    from NEAT.Client import Client
 
 
 class NEAT:
@@ -36,20 +42,24 @@ class NEAT:
 
         for client in self.__clients:
             client.genome._Genome__add_random_connection()
-            client.genome._Genome__add_random_node()
 
     def next_generation(self):
         self.generation += 1
 
-        # self.__generate_species()
-        # self.__remove_bad_clients()
-        # self.__remove_extinct_species()
+        self.__generate_species()
+        self.__remove_bad_clients()
+        self.__remove_extinct_species()
+        self.__crossover_genomes()
         self.__mutate_genomes()
+
+        # Update the ui
+        for client in self.__clients:
+            client.predict(tuple(0.1 for _ in range(Config.STRUCTURE[0])))
 
     def get_new_node(self, x: float, y: float, *, node_type: NodeType = NodeType.HIDDEN) -> Node:
         new_node = Node(idn=self.__get_node_identification(), x=x, y=y, node_type=node_type)
         self.__global_nodes.add(new_node)
-        return copy.copy(new_node)
+        return new_node
 
     def get_connection(self, from_node: Node, to_node: Node) -> Connection:
         connection = Connection(
@@ -62,17 +72,18 @@ class NEAT:
             return self.__global_connections.get(connection.idn)
 
         self.__global_connections.add(connection)
-
-        return copy.copy(connection)
+        return connection
 
     def get_species(self) -> list[Species]:
         return self.__species
 
     def __get_node_identification(self) -> float:
-        return self.__global_nodes.size()
+        return float(self.__global_nodes.size())
 
     def __generate_species(self):
-        self.__clients[0].genome = Genome.crossover(self.__clients[0].genome, self.__clients[1].genome)
+        # Reset species
+        for species in self.__species:
+            species.reset()
 
         for client in self.__clients:
             if len(self.__species) == 0:
@@ -125,6 +136,7 @@ class NEAT:
 
     def __mutate_genomes(self):
         for client in self.__clients:
+            client.set_neat(self)
             client.genome.do_random_mutation()
 
     def __init_global_nodes(self):
@@ -156,6 +168,15 @@ class NEAT:
                     )
                 )
 
+                client.calculator.calc_nodes.add(
+                    CalcNode(
+                        idn=self.__global_nodes.get(input_num).idn,
+                        x=0,
+                        y=input_num / 10,
+                        node_type=NodeType.INPUT
+                    )
+                )
+
         for output_num in range(self.__structure[0], self.__structure[0] + self.__structure[1]):
             for client in self.__clients:
                 output_node = Node(
@@ -167,6 +188,15 @@ class NEAT:
                 output_node.value = 0.5
 
                 client.genome.nodes.add(output_node)
+
+                client.calculator.calc_nodes.add(
+                    CalcNode(
+                        idn=self.__global_nodes.get(output_num).idn,
+                        x=1,
+                        y=(output_num - Config.STRUCTURE[0]) / 10,
+                        node_type=NodeType.OUTPUT
+                    )
+                )
 
         # Set Neat for each client
         for client in self.__clients:

@@ -16,8 +16,8 @@ import typing
 
 from Config import Config
 from NEAT.Connection import Connection
-from NEAT.Node import Node, NodeType
-from NEAT.utils import IdentificationCollection, sigmoid
+from NEAT.Node import Node
+from NEAT.utils import IdentificationCollection
 
 if typing.TYPE_CHECKING:
     from NEAT import NEAT
@@ -39,37 +39,6 @@ class Genome:
         ]
 
         random.choice(operations)()
-
-    # def predict(self, inputs: tuple[float, ...]) -> tuple[float, ...]:
-    #     if len(inputs) != Config.STRUCTURE[0]:
-    #         raise Exception(f"Expected input size of {Config.STRUCTURE[0]} but got inputs of size {len(inputs)}")
-    #
-    #     for node in self.nodes:
-    #         node.value = 0
-    #
-    #     # Set the inputs so we can propagate them
-    #     for i in range(Config.STRUCTURE[0]):
-    #         self.nodes.get(i).value = inputs[i]
-    #
-    #     for node in self.nodes:
-    #         connections = node.connections_to
-    #
-    #         # If the node is not an input node, normalize the value
-    #         if node.node_type != NodeType.INPUT:
-    #             node.value = sigmoid(node.value)
-    #
-    #         if len(connections) == 0:
-    #             # Node does not connect to anything
-    #             continue
-    #
-    #         for connection in connections:
-    #             if not connection.is_enabled:
-    #                 continue
-    #
-    #             connection.to_node.value += node.value * connection.weight
-    #
-    #     outputs = tuple(map(lambda n: n.value, self.nodes[Config.STRUCTURE[1] + 1:]))
-    #     return outputs
 
     @classmethod
     def crossover(cls, better: 'Genome', worse: 'Genome') -> 'Genome':
@@ -186,12 +155,13 @@ class Genome:
 
     def __add_node(self, connection: Connection):
         if connection.split_to:
-            new_node = copy.copy(connection.split_to)
+            new_node = connection.split_to
         else:
             new_node = self.neat.get_new_node(
-                connection.from_node.x + (connection.to_node.x - connection.from_node.x) / 2,
-                connection.from_node.y + (connection.to_node.y - connection.from_node.y) / 2
+                round(connection.from_node.x + (connection.to_node.x - connection.from_node.x) / 2, 2),
+                round(connection.from_node.y + (connection.to_node.y - connection.from_node.y) / 2, 2)
             )
+            connection.split_to = new_node
 
         new_from_connection = self.neat.get_connection(connection.from_node, new_node)
         new_from_connection.weight = 1

@@ -34,3 +34,6 @@ class Connection:
 
     def __hash__(self):
         return float(self.from_node.idn * Config.MAX_NUMBER_OF_NODES + self.to_node.idn)
+
+    def __repr__(self):
+        return f"Connection<from {self.from_node.idn} to {self.to_node.idn}>"

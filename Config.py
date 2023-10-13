@@ -13,8 +13,8 @@ class Config:
     STRUCTURE: tuple[int, int] = (3, 3)
     WEIGHT_THRESHOLD: tuple[float, float] = (-1, 1)
     WEIGHT_SHIFT_THRESHOLD: tuple[float, float] = (-0.5, 0.5)
-    AMOUNT_OF_CLIENTS = 1
-    MAX_NUMBER_OF_NODES = 100
+    AMOUNT_OF_CLIENTS = 10
+    MAX_NUMBER_OF_NODES = pow(2, 20)
     MIN_ADD_DISTANCE = 4
     PERCENT_OF_CLIENTS_TO_REMOVE = 50
 

@@ -32,3 +32,6 @@ class Node:
 
     def __hash__(self):
         return self.idn
+
+    def __repr__(self):
+        return f"Node<idn {self.idn} x {self.x} y {self.y}>"

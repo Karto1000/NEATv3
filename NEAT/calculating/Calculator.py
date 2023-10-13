@@ -32,7 +32,7 @@ class Calculator:
                 x=node.x,
                 y=node.y,
                 node_type=node.node_type,
-                idn=float(node.idn)
+                idn=node.idn
             )
 
             self.calc_nodes.add(calc_node)
@@ -42,8 +42,8 @@ class Calculator:
             self.calc_nodes.get(i).output = inputs[i]
 
         for connection in connections:
-            calc_from = self.calc_nodes.get(float(connection.from_node.idn))
-            calc_to = self.calc_nodes.get(float(connection.to_node.idn))
+            calc_from = self.calc_nodes.get(connection.from_node.idn)
+            calc_to = self.calc_nodes.get(connection.to_node.idn)
 
             calc_connection = CalcConnection(
                 from_node=calc_from,
