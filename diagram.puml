@@ -1,0 +1,127 @@
+@startuml
+
+package NeatPackage {
+    package Utils {
+        class IdentificationCollection<T> {
+            -List<T> list
+            -dict<double, T> dict
+
+            +Optional[T] get(int index)
+            +Optional[T] get(int identification_number)
+            +void remove(T object)
+            +void remove(int identification_number)
+            +boolean contains(T object)
+            +void append(T object)
+        }
+    }
+
+    class Connection {
+        +double identification_number
+        +Node from_node
+        +Node to_node
+        +double weight
+        +boolean is_enabled
+
+        +boolean __eq__(Any other)
+    }
+
+    enum NodeType {
+        INPUT
+        HIDDEN
+        OUTPUT
+    }
+
+    class Node {
+        +double identification_number
+        +IdentificationCollection<Connection> connections
+        +double value
+        +NodeType node_type
+        +int x
+        +int y
+
+        +boolean __eq__(Any other)
+    }
+
+    abstract Client {
+        +Genome genome
+        +double fitness
+        +Species species
+
+        +double[] predict(double[] inputs)
+    }
+
+    class Species {
+        +List<Client> members
+        +Client representative
+
+        +boolean add(Client client)
+        +Genome breed()
+        +void reset()
+    }
+
+    class Genome {
+        +IdentificationCollection<Connection> connections
+        +IdentificationCollection<Node> nodes
+        ===
+        -void add_connection(Node first, Node second)
+        -void add_node(Connection connection)
+        -void shift_weight(Connection connection)
+        -void toggle_connectio(Connection connection)
+        -void replace_weight(Connection connection)
+        -void add_random_connection()
+        -void add_random_node()
+        -void shift_random_weight()
+        -void toggle_random_connection()
+        -void replace_random_weight()
+        ---
+        +void do_random_mutation()
+        +double[] predict(double[] inputs)
+        ---
+        +{static} Genome crossover(Genome better, Genome worse)
+        +{static} double distance(Genome first, Genome second)
+    }
+
+    class NEAT {
+        -List<Species> species
+        -List<Client> clients
+        -IdentificationCollection<Node> global_nodes
+        -IdentificationCollection<Connection> global_connections
+
+        +void __init__(List<Client> clients, tuple[int, int] structure)
+        +void next_generation()
+
+        -void remove_extinct_species()
+        -double get_new_node_identification()
+        -double get_new_connection_identification()
+    }
+
+    Species <-- NEAT
+
+    Client o-- Species
+
+    Genome *-- Client
+    Species o-- Client
+
+    Connection *-- Genome
+    Node *-- Genome
+
+    Connection o-- Node
+    NodeType *-- Node
+    Node o-- Connection
+}
+
+package ExampleFlappyBirdGame {
+    class ExampleFlappy {
+        +void update()
+        +void draw()
+    }
+
+    class Game {
+        +NEAT neat
+    }
+
+    Client <|-- ExampleFlappy
+    NEAT *-- Game
+}
+
+@enduml
