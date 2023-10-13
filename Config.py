@@ -13,7 +13,7 @@ class Config:
     STRUCTURE: tuple[int, int] = (3, 3)
     WEIGHT_THRESHOLD: tuple[float, float] = (-1, 1)
     WEIGHT_SHIFT_THRESHOLD: tuple[float, float] = (-0.5, 0.5)
-    AMOUNT_OF_CLIENTS = 20
+    AMOUNT_OF_CLIENTS = 1
     MAX_NUMBER_OF_NODES = pow(2, 20)
     MIN_ADD_DISTANCE = 4
     PERCENT_OF_CLIENTS_TO_REMOVE = 50
@@ -28,9 +28,11 @@ class Config:
     }
 
     # Display Config
-    SW, SH = 800, 800
+    SW, SH = 800, 640
     NETWORK_PADDING = (50, 50)
     NODE_RADIUS = 15
 
     NODE_X_MULTIPLIER = 400
     NODE_Y_MULTIPLIER = 450
+
+    TEXT_PADDING = (10, 10)
