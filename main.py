@@ -1,6 +1,6 @@
 import random
-import sys
 
+import numpy.random
 import pygame
 
 from Config import Config
@@ -12,9 +12,9 @@ SCREEN = pygame.display.set_mode((Config.SW, Config.SH))
 FONT = pygame.font.SysFont("Arial", 12)
 current_client = 0
 
-seed = random.randrange(sys.maxsize)
-random.seed(1703487886160643318)
-print(seed)
+seed = random.randrange(pow(2, 32))
+random.seed(seed)
+numpy.random.seed(seed)
 
 
 class FlappyClient(Client):
@@ -24,30 +24,6 @@ class FlappyClient(Client):
 
     def draw(self):
         for node in self.calculator.calc_nodes:
-            pygame.draw.circle(
-                SCREEN,
-                (0, 0, 0),
-                (node.x * Config.NODE_X_MULTIPLIER + Config.NETWORK_PADDING[0],
-                 node.y * Config.NODE_Y_MULTIPLIER + Config.NETWORK_PADDING[1]),
-                Config.NODE_RADIUS + abs(node.output * 2)
-            )
-
-            pygame.draw.circle(
-                SCREEN,
-                (255, 255, 255),
-                (node.x * Config.NODE_X_MULTIPLIER + Config.NETWORK_PADDING[0],
-                 node.y * Config.NODE_Y_MULTIPLIER + Config.NETWORK_PADDING[1]),
-                Config.NODE_RADIUS - 2
-            )
-
-            val_text = FONT.render(f"{round(node.output, 2)}", True, (0, 0, 0))
-            SCREEN.blit(
-                val_text,
-                (
-                    node.x * Config.NODE_X_MULTIPLIER + Config.NETWORK_PADDING[0] - val_text.get_width() / 2,
-                    node.y * Config.NODE_Y_MULTIPLIER + Config.NETWORK_PADDING[1] - val_text.get_height() / 2
-                )
-            )
 
             for connection in node.connections_to:
                 color = (0, 0, 0)
@@ -72,6 +48,31 @@ class FlappyClient(Client):
                     ),
                     max(1, round(abs(connection.weight) * 3))
                 )
+
+            pygame.draw.circle(
+                SCREEN,
+                (0, 0, 0),
+                (node.x * Config.NODE_X_MULTIPLIER + Config.NETWORK_PADDING[0],
+                 node.y * Config.NODE_Y_MULTIPLIER + Config.NETWORK_PADDING[1]),
+                Config.NODE_RADIUS + abs(node.output * 2)
+            )
+
+            pygame.draw.circle(
+                SCREEN,
+                (255, 255, 255),
+                (node.x * Config.NODE_X_MULTIPLIER + Config.NETWORK_PADDING[0],
+                 node.y * Config.NODE_Y_MULTIPLIER + Config.NETWORK_PADDING[1]),
+                Config.NODE_RADIUS - 2
+            )
+
+            val_text = FONT.render(f"{round(node.output, 2)}", True, (0, 0, 0))
+            SCREEN.blit(
+                val_text,
+                (
+                    node.x * Config.NODE_X_MULTIPLIER + Config.NETWORK_PADDING[0] - val_text.get_width() / 2,
+                    node.y * Config.NODE_Y_MULTIPLIER + Config.NETWORK_PADDING[1] - val_text.get_height() / 2
+                )
+            )
 
 
 clients = [FlappyClient() for i in range(Config.AMOUNT_OF_CLIENTS)]
@@ -108,7 +109,7 @@ while True:
 
     for i, species_ in enumerate(species):
         species_num = FONT.render(f"Species {i}", True, (0, 0, 0))
-        SCREEN.blit(species_num, (Config.SW - species_num.get_width(), species_num.get_height() * i + 5))
+        SCREEN.blit(species_num, (Config.SW - species_num.get_width() - 5, species_num.get_height() * i + 5))
 
     text = FONT.render(f"Current Client: {current_client}", True, (0, 0, 0))
     SCREEN.blit(text, (0, 0))

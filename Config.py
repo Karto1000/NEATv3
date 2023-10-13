@@ -13,10 +13,19 @@ class Config:
     STRUCTURE: tuple[int, int] = (3, 3)
     WEIGHT_THRESHOLD: tuple[float, float] = (-1, 1)
     WEIGHT_SHIFT_THRESHOLD: tuple[float, float] = (-0.5, 0.5)
-    AMOUNT_OF_CLIENTS = 10
+    AMOUNT_OF_CLIENTS = 20
     MAX_NUMBER_OF_NODES = pow(2, 20)
     MIN_ADD_DISTANCE = 4
     PERCENT_OF_CLIENTS_TO_REMOVE = 50
+
+    ACTIONS_CHANCES = {
+        "CHANCE_TO_TOGGLE": 0.01,
+        "CHANCE_TO_SHIFT": 0.1,
+        "CHANCE_TO_ADD_CONNECTION": 0.19,
+        "CHANCE_TO_ADD_NODE": 0.1,
+        "CHANCE_TO_REPLACE_WEIGHT": 0.1,
+        "NONE": 0.5
+    }
 
     # Display Config
     SW, SH = 800, 800

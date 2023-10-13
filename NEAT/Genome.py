@@ -10,9 +10,10 @@
 # -----------------------------------------------------------
 from __future__ import annotations
 
-import copy
 import random
 import typing
+
+import numpy
 
 from Config import Config
 from NEAT.Connection import Connection
@@ -30,15 +31,28 @@ class Genome:
         self.neat: NEAT = None
 
     def do_random_mutation(self):
+        weights = [
+            Config.ACTIONS_CHANCES.get("CHANCE_TO_REPLACE_WEIGHT"),
+            Config.ACTIONS_CHANCES.get("CHANCE_TO_ADD_CONNECTION"),
+            Config.ACTIONS_CHANCES.get("CHANCE_TO_ADD_NODE"),
+            Config.ACTIONS_CHANCES.get("CHANCE_TO_SHIFT"),
+            Config.ACTIONS_CHANCES.get("CHANCE_TO_TOGGLE"),
+            Config.ACTIONS_CHANCES.get("NONE")
+        ]
+
         operations = [
             self.__replace_random_weight,
             self.__add_random_connection,
             self.__add_random_node,
             self.__shift_random_weight,
-            self.__toggle_random_connection
+            self.__toggle_random_connection,
+            None
         ]
 
-        random.choice(operations)()
+        fun: typing.Optional[typing.Callable] = numpy.random.choice(operations, p=weights)
+
+        if fun is not None:
+            fun()
 
     @classmethod
     def crossover(cls, better: 'Genome', worse: 'Genome') -> 'Genome':
@@ -89,7 +103,7 @@ class Genome:
                 new_genome.connections.add(worse_connection)
 
         for i in range(Config.STRUCTURE[0] + Config.STRUCTURE[1]):
-            new_genome.nodes.add(better.nodes.get(i))
+            new_genome.nodes.add(better.nodes.get(float(i)))
 
         for connection in new_genome.connections:
             if not new_genome.nodes.contains(connection.from_node):
